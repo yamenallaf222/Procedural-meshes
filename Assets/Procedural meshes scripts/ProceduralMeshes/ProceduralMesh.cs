@@ -9,11 +9,12 @@ public class ProceduralMesh : MonoBehaviour
 {
 	static MeshJobScheduleDelegate[] jobs = {
 		MeshJob<SquareGrid, SingleStream>.ScheduleParallel,
-		MeshJob<SharedSquareGrid, SingleStream>.ScheduleParallel
+		MeshJob<SharedSquareGrid, SingleStream>.ScheduleParallel,
+		MeshJob<SharedTriangleGrid, SingleStream>.ScheduleParallel
 	};
 
 	public enum MeshType{
-		SquareGrid, SharedSquareGrid
+		SquareGrid, SharedSquareGrid, SharedTriangleGrid
 	};
 
 	[SerializeField]
