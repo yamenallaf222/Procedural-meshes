@@ -38,9 +38,9 @@ namespace ProceduralMeshes.Generators {
             vertex.tangent.xw = float2(1f, -1f);
 
             vertex.position.x = -0.5f;
-            vertex.position.z = (float) z / Resolution + xOffset;
+            vertex.position.z = ((float)z / Resolution - 0.5f) * sqrt(3f) / 2f;
             vertex.texCoord0.x = uOffset;
-            vertex.texCoord0.y = (float) z / Resolution;
+            vertex.texCoord0.y = vertex.position.z / (1f + 0.5f / Resolution) + 0.5f;
             streams.SetVertex(vi, vertex);
 
             vi += 1;
