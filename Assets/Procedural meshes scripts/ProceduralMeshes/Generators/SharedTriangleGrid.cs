@@ -23,7 +23,7 @@ namespace ProceduralMeshes.Generators {
 			int vi = (Resolution + 1) * z, ti = 2 * Resolution * (z - 1);
 
             float xOffset = -0.25f;
-            float uOffset = 0;
+            float uOffset = 0f;
 
             if((z & 1) == 1) {
                 xOffset = 0.25f;
@@ -32,13 +32,12 @@ namespace ProceduralMeshes.Generators {
 
             xOffset = xOffset / Resolution - 0.5f;
 
-
             var vertex = new Vertex();
             vertex.normal.y = 1f;
             vertex.tangent.xw = float2(1f, -1f);
 
-            vertex.position.x = -0.5f;
-            vertex.position.z = ((float)z / Resolution - 0.5f) * sqrt(3f) / 2f;
+            vertex.position.x = xOffset;
+            vertex.position.z = ((float) z / Resolution - 0.5f) * sqrt(3f) / 2f;
             vertex.texCoord0.x = uOffset;
             vertex.texCoord0.y = vertex.position.z / (1f + 0.5f / Resolution) + 0.5f;
             streams.SetVertex(vi, vertex);
@@ -47,7 +46,7 @@ namespace ProceduralMeshes.Generators {
 
             for(int x = 1; x <= Resolution; x++, vi++, ti += 2)
             {
-                vertex.position.x = (float) x / Resolution - 0.5f;
+                vertex.position.x = (float) x / Resolution + xOffset;
                 vertex.texCoord0.x = x / (Resolution + 0.5f) + uOffset;
                 streams.SetVertex(vi, vertex);
 
