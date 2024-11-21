@@ -15,19 +15,25 @@ namespace ProceduralMeshes.Generators {
 
 		public int JobLength => Resolution + 1;
 
-		public Bounds Bounds => new Bounds(Vector3.zero, new Vector3(1f, 0f, 1f));
+		public Bounds Bounds => new Bounds(Vector3.zero, new Vector3(1f + 0.5f / Resolution, 0f, sqrt(3f) / 2f));
 
-
+        
 		public void Execute<S> (int z, S streams) where S : struct, IMeshStreams {
-
+            
 			int vi = (Resolution + 1) * z, ti = 2 * Resolution * (z - 1);
 
             float xOffset = -0.25f;
             float uOffset = 0f;
 
+            int iA = -Resolution - 2, iB = -Resolution - 1, iC = -1, iD = 0;
+            var tA = int3(iA, iC, iD);
+            var tB = int3(iA, iD, iB);
+
             if((z & 1) == 1) {
                 xOffset = 0.25f;
                 uOffset = 0.5f / (Resolution + 0.5f);
+                tA = int3(iA, iC, iB);
+                tB = int3(iB, iC, iD);
             }
 
             xOffset = xOffset / Resolution - 0.5f;
@@ -52,10 +58,10 @@ namespace ProceduralMeshes.Generators {
 
                 if (z > 0) {
 					streams.SetTriangle(
-						ti + 0, vi + int3(-Resolution - 2, -1, -Resolution - 1)
+						ti + 0, vi + tA
 					);
 					streams.SetTriangle(
-						ti + 1, vi + int3(-Resolution - 1, -1, 0)
+						ti + 1, vi + tB
 					);
 				}
             }
