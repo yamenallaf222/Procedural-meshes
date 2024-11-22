@@ -15,7 +15,10 @@ namespace ProceduralMeshes.Generators {
 
 		public int JobLength => Resolution;
 
-		public Bounds Bounds => new Bounds(Vector3.zero, new Vector3(1f, 0f, 1f));
+		public Bounds Bounds => new Bounds(Vector3.zero, new Vector3(
+			(Resolution > 1 ? 0.5f + 0.25f / Resolution : 0.5f) * sqrt(3f),
+			0f,
+			0.75f + 0.25f / Resolution));
 
 
 		public void Execute<S> (int z, S streams) where S : struct, IMeshStreams {
@@ -23,15 +26,27 @@ namespace ProceduralMeshes.Generators {
 			int vi = 7 * Resolution * z, ti = 6 * Resolution * z;
 
 			float h = sqrt(3f) / 4f;
+
+			float2 centerOffset = 0f;
+
+			if(Resolution > 1) {
+				centerOffset.x = (((z & 1) == 0 ? 0.5f : 1.5f) - Resolution) * h;
+				centerOffset.y = -0.375f * (Resolution - 1);
+			}
+
+
 			
 			for(int x = 0; x < Resolution; x++, vi += 7, ti += 6) {
-				var xCoordinates = float2(-h, h) / Resolution;
-				var zCoordinates = float4(-0.5f, -0.25f, 0.25f, 0.5f) / Resolution;
+				var center = (float2(2f * h * x, 0.75f * z) + centerOffset) / Resolution;
+
+				var xCoordinates = center.x + float2(-h, h) / Resolution;
+				var zCoordinates = center.y + float4(-0.5f, -0.25f, 0.25f, 0.5f) / Resolution;
 
 				var vertex = new Vertex();
 				vertex.normal.y = 1f;
 				vertex.tangent.xw = float2(1f, -1f);
 
+				vertex.position.xz = center;
 				vertex.texCoord0 = 0.5f;
 				streams.SetVertex(vi + 0, vertex);
 
@@ -48,7 +63,7 @@ namespace ProceduralMeshes.Generators {
 				vertex.texCoord0.y = 0.75f; 
 				streams.SetVertex(vi + 3, vertex);
 
-				vertex.position.x = 0f;
+				vertex.position.x = center.x;
 				vertex.position.z = zCoordinates.w;
 				vertex.texCoord0 = float2(0.5f, 1f);
 				streams.SetVertex(vi + 4, vertex);
