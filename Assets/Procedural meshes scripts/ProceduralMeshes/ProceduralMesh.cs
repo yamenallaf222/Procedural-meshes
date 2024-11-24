@@ -22,11 +22,13 @@ public class ProceduralMesh : MonoBehaviour
 		MeshJob<SharedSquareGrid, SingleStream>.ScheduleParallel,
 		MeshJob<SharedTriangleGrid, SingleStream>.ScheduleParallel,
 		MeshJob<PointyHexagonGrid, SingleStream>.ScheduleParallel,
-		MeshJob<FlatHexagonGrid, SingleStream>.ScheduleParallel
+		MeshJob<FlatHexagonGrid, SingleStream>.ScheduleParallel,
+		MeshJob<UVSphere, SingleStream>.ScheduleParallel
 	};
 
 	public enum MeshType{
-		SquareGrid, SharedSquareGrid, SharedTriangleGrid, PointyHexagonGrid, FlatHexagonGrid
+		SquareGrid, SharedSquareGrid, SharedTriangleGrid,
+		PointyHexagonGrid, FlatHexagonGrid, UVSphere
 	};
 
 	[SerializeField]
@@ -82,7 +84,7 @@ public class ProceduralMesh : MonoBehaviour
 		if(drawNormals && normals == null) {
 			normals = mesh.normals;
 		}
-		if(drawTangents && normals == null) {
+		if(drawTangents && tangents == null) {
 			tangents = mesh.tangents;
 		}
 
