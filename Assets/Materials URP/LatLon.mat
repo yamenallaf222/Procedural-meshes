@@ -7,12 +7,11 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MeshMaterial
+  m_Name: LatLon
   m_Shader: {fileID: -6465566751694194690, guid: 31b4e7af71eb4c5478977ebf68b6a6ed, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - _RIPPLE
+  m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -29,7 +28,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Base_Map:
-        m_Texture: {fileID: 2800000, guid: eeada49302072bb43bcdce4d040edfb6, type: 3}
+        m_Texture: {fileID: 2800000, guid: eb8d8e31e92142f4f9a16c90cef64564, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -61,7 +60,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal_Map:
-        m_Texture: {fileID: 2800000, guid: 9da8a4a73a084b946a8b4af8cd34873e, type: 3}
+        m_Texture: {fileID: 2800000, guid: a997e136c96994446a78187ca99c34de, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -112,7 +111,7 @@ Material:
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RIPPLE: 1
+    - _RIPPLE: 0
     - _ReceiveShadows: 1
     - _RippleAmplitude: 0.1
     - _RipplePeriod: 3

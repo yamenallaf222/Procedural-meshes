@@ -8,6 +8,14 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class ProceduralMesh : MonoBehaviour
 {
+	public enum MaterialMode {Flat, Ripple, LatLonMap, CubeMap}
+
+	[SerializeField]
+	MaterialMode material;
+
+	[SerializeField]
+	Material[] materials;
+
 	[System.Flags]
 	public enum GizmoMode {Nothing = 0, Vertices = 1, Normals = 0b10, Tangents = 0b100}
 
@@ -55,6 +63,8 @@ public class ProceduralMesh : MonoBehaviour
 		vertices = null;
 		normals = null;
 		tangents = null;
+
+		GetComponent<MeshRenderer>().material = materials[(int) material];
 	}
 
 	void GenerateMesh(){
