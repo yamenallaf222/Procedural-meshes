@@ -370,7 +370,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: d90ce24468d708542a8b96bbcd6dd217, type: 2}
   - {fileID: 2100000, guid: ab143bb269710ff43a34d122042510ab, type: 2}
   - {fileID: 2100000, guid: 44a04522cd878c748926f0a12ce66d5b, type: 2}
-  gizmos: -1
+  gizmos: 1
   meshType: 5
   resolution: 1
 --- !u!23 &1058427938

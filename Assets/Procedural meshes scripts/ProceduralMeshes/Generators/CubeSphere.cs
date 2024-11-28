@@ -7,7 +7,9 @@ namespace ProceduralMeshes.Generators {
 
 	public struct CubeSphere : IMeshGenerator {
 		
-		static float3 CubeToSphere (float3 p) => normalize(p);
+		static float3 CubeToSphere (float3 p) => p * sqrt (
+			1f - ((p * p).yxx + (p * p).zzy) / 2f + (p * p).yxx * (p*p).zzy / 3f
+		);
 		static Side GetSide(int id) => id switch {
 			0 => new Side {
 				id = id,
