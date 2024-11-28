@@ -14,56 +14,42 @@ namespace ProceduralMeshes.Generators {
 				uvOrigin = -1f,
 				uVector = 2f * right(),
 				vVector = 2f * up(),
-				normal = back(),
-				tangent = float4(1f, 0f, 0f, -1f)
 			},
 			1 => new Side {
 				id = id,
 				uvOrigin = float3(1f, -1f, -1f),
 				uVector = 2f * forward(),
 				vVector = 2f * up(),
-				normal = right(),
-				tangent = float4(0f, 0f, 1f, -1f)
 			},
 			2 => new Side {
 				id = id,
 				uvOrigin = -1f,
 				uVector = 2f * forward(),
 				vVector = 2f * right(),
-				normal = down(),
-				tangent = float4(0f, 0f, 1f, -1f)
 			},
 			3 => new Side {
 				id = id,
 				uvOrigin = float3(-1f, -1f, 1f),
 				uVector = 2f * up(),
 				vVector = 2f * right(),
-				normal = forward(),
-				tangent = float4(0f, 1f, 0f, -1f)
 			},
 			4 => new Side {
 				id = id,
 				uvOrigin = -1f,
 				uVector = 2f * up(),
 				vVector = 2f * forward(),
-				normal = left(),
-				tangent = float4(0f, 1f, 0f, -1f)
 			},
 			_ => new Side {
 				id = id,
 				uvOrigin = float3(-1f, 1f, -1f),
 				uVector = 2f * right(),
 				vVector = 2f * forward(),
-				normal = up(),
-				tangent = float4(1f, 0f, 0f, -1f)
 			}
 		};
 
 		struct Side {
 			public int id;
 			public float3 uvOrigin, uVector, vVector;
-			public float3 normal;
-			public float4 tangent;
 		}
 
 		public int Resolution { get; set; }
@@ -102,23 +88,24 @@ namespace ProceduralMeshes.Generators {
 				// vertex.tangent = side.tangent;
 
 				vertex.position = pA;
-				vertex.normal = pA;
+				vertex.normal = normalize(cross(pC - pA, vertex.tangent.xyz));
 				vertex.texCoord0 = 0f;
 				streams.SetVertex(vi + 0, vertex);
 
 				vertex.position = pB;
-				vertex.normal = pB;
+				vertex.normal = normalize(cross(pD - pB, vertex.tangent.xyz));
 				vertex.texCoord0 = float2(1f, 0f);
 				streams.SetVertex(vi + 1, vertex);
 
 				vertex.position = pC;
-				vertex.normal = pC;
+				// vertex.normal = pC;
 				vertex.tangent.xyz = normalize(pD - pC);
+				vertex.normal = normalize(cross(pC - pA, vertex.tangent.xyz));
 				vertex.texCoord0 = float2(0f, 1f);
 				streams.SetVertex(vi + 2, vertex);
 
 				vertex.position = pD;
-				vertex.normal = pD;
+				vertex.normal = normalize(cross(pD - pB, vertex.tangent.xyz));
 				vertex.texCoord0 = 1f;
 				streams.SetVertex(vi + 3, vertex);
 				
