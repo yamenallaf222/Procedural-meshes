@@ -104,7 +104,7 @@ public class ProceduralMesh : MonoBehaviour
 			Vector3 position = t.TransformPoint(vertices[i]);
 			if(drawVertices) {
 				Gizmos.color = Color.cyan;
-				Gizmos.DrawSphere(vertices[i], 0.02f);
+				Gizmos.DrawSphere(position, 0.02f);
 			}
 			if(drawNormals) {
 				Gizmos.color = Color.green;
