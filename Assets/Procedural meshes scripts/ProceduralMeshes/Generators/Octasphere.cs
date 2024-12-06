@@ -11,58 +11,67 @@ namespace ProceduralMeshes.Generators {
 		// static float3 CubeToSphere (float3 p) => p * sqrt (
 		// 	1f - ((p * p).yxx + (p * p).zzy) / 2f + (p * p).yxx * (p*p).zzy / 3f
 		// );
-		static Rhombus GetRhombus(int id) => id switch {
+		static Rhombus 	GetRhombus(int id) => id switch {
 			0 => new Rhombus {
 				id = id,
-				uvOrigin = -1f,
-				uVector = 2f * right(),
-				vVector = 2f * up(),
-				seamStep = 4
+				leftCorner = back(),
+				rightCorner = right()
+				// uvOrigin = -1f,
+				// uVector = 2f * right(),
+				// vVector = 2f * up(),
+				// seamStep = 4
 			},
 			1 => new Rhombus {
 				id = id,
-				uvOrigin = float3(1f, -1f, -1f),
-				uVector = 2f * forward(),
-				vVector = 2f * up(),
-				seamStep = 4
+				leftCorner = right(),
+				rightCorner = forward()
+				// uvOrigin = float3(1f, -1f, -1f),
+				// uVector = 2f * forward(),
+				// vVector = 2f * up(),
+				// seamStep = 4
 			},
 			2 => new Rhombus {
 				id = id,
-				uvOrigin = -1f,
-				uVector = 2f * forward(),
-				vVector = 2f * right(),
-				seamStep = -2
+				leftCorner = forward(),
+				rightCorner = left()
+				// uvOrigin = -1f,
+				// uVector = 2f * forward(),
+				// vVector = 2f * right(),
+				// seamStep = -2
 			},
-			3 => new Rhombus {
-				id = id,
-				uvOrigin = float3(-1f, -1f, 1f),
-				uVector = 2f * up(),
-				vVector = 2f * right(),
-				seamStep = -2
-			},
-			4 => new Rhombus {
-				id = id,
-				uvOrigin = -1f,
-				uVector = 2f * up(),
-				vVector = 2f * forward(),
-				seamStep = -2
+			// 3 => new Rhombus {
+			// 	id = id,
+			// 	uvOrigin = float3(-1f, -1f, 1f),
+			// 	uVector = 2f * up(),
+			// 	vVector = 2f * right(),
+			// 	seamStep = -2
+			// },
+			// 4 => new Rhombus {
+			// 	id = id,
+			// 	uvOrigin = -1f,
+			// 	uVector = 2f * up(),
+			// 	vVector = 2f * forward(),
+			// 	seamStep = -2
 
-			},
+			// },
 			_ => new Rhombus {
 				id = id,
-				uvOrigin = float3(-1f, 1f, -1f),
-				uVector = 2f * right(),
-				vVector = 2f * forward(),
-				seamStep = -2
+				leftCorner = left(),
+				rightCorner = back()
+				// uvOrigin = float3(-1f, 1f, -1f),
+				// uVector = 2f * right(),
+				// vVector = 2f * forward(),
+				// seamStep = -2
 			}
 		};
 
 		struct Rhombus {
 			public int id;
-			public float3 uvOrigin, uVector, vVector;
-			public int seamStep;
+			public float3 leftCorner, rightCorner;
+			// public float3 uvOrigin, uVector, vVector;
+			// public int seamStep;
 
-			public bool TouchesMinimumPole => (id & 1) == 0;
+			// public bool TouchesMinimumPole => (id & 1) == 0;
 		}
 
 		public int Resolution { get; set; }
@@ -74,8 +83,16 @@ namespace ProceduralMeshes.Generators {
 
 		public Bounds Bounds => new Bounds(Vector3.zero, new Vector3(2f, 2f, 2f));
 
+		public void Execute<S>(int i, S streams) where S : struct, IMeshStreams {
+			if(i == 0) {
+				ExecutePolesAndSeam(streams);
+			} else {
+				ExecuteRegular(i - 1, streams);
+			}
+		}
 
-		public void Execute<S> (int i, S streams) where S : struct, IMeshStreams {
+
+		public void ExecuteRegular<S> (int i, S streams) where S : struct, IMeshStreams {
 
 			int u = i / 4;
 
@@ -84,13 +101,31 @@ namespace ProceduralMeshes.Generators {
 			int vi = Resolution * (Resolution * rhombus.id + u + 2) + 7;
 			int ti = 2 * Resolution * (Resolution * rhombus.id + u);
 			bool firstColumn = u == 0;
+
+			int4 quad = 0;
+			if (firstColumn && rhombus.id == 0) {
+				quad.x = vi;
+				quad.y = 0;
+				quad.z = 8;
+				quad.w = vi + 1;
+			}
+
 			u += 1;
 
 			// float3 pStart = rhombus.uvOrigin + rhombus.uVector * u / Resolution;
 			// float3 uB = Rhombus.uvOrigin + Rhombus.uVector * (u + 1) / Resolution;
 			// float3 pA = CubeToSphere(uA), pB = CubeToSphere(uB);
 
+			float3 columnBottomDir = rhombus.rightCorner - down();
+			float3 columnBottomStart = down() + columnBottomDir * u / Resolution;
+			float3 columnBottomEnd = rhombus.leftCorner + columnBottomDir * u / Resolution;
+
+			float3 columnTopDir = up() - rhombus.leftCorner;
+			float3 columnTopStart = rhombus.rightCorner + columnTopDir * ((float)u / Resolution - 1f);
+			float3 columnTopEnd = rhombus.leftCorner + columnTopDir * u / Resolution;
+
 			var vertex = new Vertex();
+			vertex.position = columnBottomStart;
 
 			// if(i == 0) {
 			// 	vertex.position = -sqrt(1f / 3f);
@@ -126,9 +161,17 @@ namespace ProceduralMeshes.Generators {
 			// 		Resolution * ((rhombus.seamStep + 1) * Resolution - u) + u :
 			// 		(rhombus.seamStep + 1) * Resolution * Resolution - Resolution + 1;
 
-			for(int v = 1; v < Resolution; v++, vi ++, ti += 2) {
+			for(int v = 1; v < Resolution; v++, vi++, ti += 2) {
 				
 				// vertex.position = CubeToSphere(pStart + rhombus.vVector * v  / Resolution);
+				if (v <= Resolution - u) {
+					vertex.position = lerp(columnBottomStart, columnBottomEnd, (float) v / Resolution);
+				} else {
+					vertex.position = lerp(columnTopStart, columnTopEnd, (float) v / Resolution);
+					
+				}
+
+
 				streams.SetVertex(vi, vertex);
 				// float3 pD = CubeToSphere(uB + Rhombus.vVector * v / Resolution);
 
@@ -173,16 +216,56 @@ namespace ProceduralMeshes.Generators {
 				// 	triangle.z += firstColumn && Rhombus.TouchesMinimumPole ? Resolution : 1;
 				// }
 
-				streams.SetTriangle(ti + 0, 0);
-				streams.SetTriangle(ti + 1, 0);
+				streams.SetTriangle(ti + 0, quad.xyz);
+				streams.SetTriangle(ti + 1, quad.xzw);
+
+				quad.y = quad.z;
+				quad += int4(1, 0, 1, 1);
 
 				// pA = pC;
 				// pB = pD;
 			}
 
-			streams.SetTriangle(ti + 0, 0);
-			streams.SetTriangle(ti + 1, 0);
+			if( firstColumn && rhombus.id == 0) {
+				quad.w = quad.z + 1;
+			}
 
+			streams.SetTriangle(ti + 0, quad.xyz);
+			streams.SetTriangle(ti + 1, quad.xzw);
+
+		}
+
+		public void ExecutePolesAndSeam<S>(S streams) where S : struct, IMeshStreams {
+			var vertex = new Vertex();
+			vertex.tangent = float4( sqrt(0.5f), 0f, sqrt(0.5f), -1f);
+			vertex.texCoord0.x = 0.125f;
+
+			for( int i = 0; i < 4; i++) {
+				vertex.position = vertex.normal = down();
+				vertex.texCoord0.y  = 0f;
+				streams.SetVertex(i, vertex);
+				vertex.position = vertex.normal = up();
+				vertex.texCoord0.y = 1f;
+				streams.SetVertex(i + 4, vertex);
+				vertex.tangent.xz = float2(- vertex.tangent.z, vertex.tangent.x);
+				vertex.texCoord0 += 0.25f;
+			}
+
+			vertex.tangent.xz = float2(1f, 0f);
+			vertex.texCoord0.x = 0f;
+
+			for(int v = 1; v < 2 * Resolution; v++) {
+				if(v < Resolution) {
+					vertex.position = lerp(down(), back(), (float) v / Resolution);
+				}
+				else
+				{
+					vertex.position = 
+						lerp(back(), up(), (float)(v - Resolution) / Resolution);
+				}
+				vertex.normal = normalize(vertex.position);
+				streams.SetVertex(v + 7, vertex);
+			}
 		}
     }
 }

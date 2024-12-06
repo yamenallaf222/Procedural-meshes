@@ -88,7 +88,7 @@ public class ProceduralMesh : MonoBehaviour
 		GetComponent<MeshRenderer>().material = materials[(int) material];
 	}
 
-	void GenerateMesh(){
+	void GenerateMesh() {
         Mesh.MeshDataArray meshDataArray = Mesh.AllocateWritableMeshData(1);
 		Mesh.MeshData meshData = meshDataArray[0];
 
@@ -108,7 +108,6 @@ public class ProceduralMesh : MonoBehaviour
 			mesh.Optimize();
 		}
 
-		mesh.Optimize();
     }
 
 	void OnDrawGizmos()
@@ -156,7 +155,7 @@ public class ProceduralMesh : MonoBehaviour
 				Gizmos.color = Color.red;
 				Gizmos.DrawRay(position, t.TransformDirection(tangents[i]) * 0.2f);
 			}
-			}
+		}	
 		
 		if(drawTriangles) {
 			// Gizmos.color = Color.magenta;
