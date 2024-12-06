@@ -11,6 +11,21 @@ namespace ProceduralMeshes.Generators {
 		// static float3 CubeToSphere (float3 p) => p * sqrt (
 		// 	1f - ((p * p).yxx + (p * p).zzy) / 2f + (p * p).yxx * (p*p).zzy / 3f
 		// );
+
+
+		static float2 GetTangentXZ (float3 p) => normalize(float2(-p.z, p.x));
+		static float2 GetTexCoord (float3 p) {
+			var texCoord = float2(
+				atan2(p.x, p.z) / (-2f * PI) + 0.5f,
+				asin(p.y) / PI + 0.5f
+			);
+			if ( texCoord.x < 1e-6f) {
+				texCoord.x = 1f;
+			}
+			
+			return texCoord;
+		}
+
 		static Rhombus 	GetRhombus(int id) => id switch {
 			0 => new Rhombus {
 				id = id,
@@ -102,13 +117,26 @@ namespace ProceduralMeshes.Generators {
 			int ti = 2 * Resolution * (Resolution * rhombus.id + u);
 			bool firstColumn = u == 0;
 
-			int4 quad = 0;
-			if (firstColumn && rhombus.id == 0) {
-				quad.x = vi;
-				quad.y = 0;
-				quad.z = 8;
-				quad.w = vi + 1;
-			}
+			int4 quad = int4(
+				vi, 
+				firstColumn ? rhombus.id : vi - Resolution,
+				firstColumn ? 
+					rhombus.id == 0 ? 8 : vi - Resolution * (Resolution + u) :
+					vi - Resolution + 1,
+				vi + 1
+			);
+			// if (rhombus.id == 0) {
+			// 	quad.x = vi;
+			// 	quad.y = firstColumn ? 0 : vi - Resolution;
+			// 	quad.z = firstColumn ? 8 : vi - Resolution + 1;
+			// 	quad.w = vi + 1;
+			// } 
+			// else {
+			// 	quad.x = vi;
+			// 	quad.y = firstColumn ? rhombus.id : vi - Resolution;
+			// 	quad.z = firstColumn ? vi - Resolution * (Resolution + u) : vi - Resolution + 1;
+			// 	quad.w = vi + 1;
+			// }
 
 			u += 1;
 
@@ -125,7 +153,10 @@ namespace ProceduralMeshes.Generators {
 			float3 columnTopEnd = rhombus.leftCorner + columnTopDir * u / Resolution;
 
 			var vertex = new Vertex();
-			vertex.position = columnBottomStart;
+			vertex.normal = vertex.position = normalize(columnBottomStart);
+			vertex.tangent.xz = GetTangentXZ(vertex.position);
+			vertex.tangent.w = -1f;
+			vertex.texCoord0 = GetTexCoord(vertex.position);
 
 			// if(i == 0) {
 			// 	vertex.position = -sqrt(1f / 3f);
@@ -171,7 +202,9 @@ namespace ProceduralMeshes.Generators {
 					
 				}
 
-
+				vertex.normal = vertex.position = normalize(vertex.position);
+				vertex.tangent.xz = GetTangentXZ(vertex.position);
+				vertex.texCoord0 = GetTexCoord(vertex.position);
 				streams.SetVertex(vi, vertex);
 				// float3 pD = CubeToSphere(uB + Rhombus.vVector * v / Resolution);
 
@@ -220,15 +253,24 @@ namespace ProceduralMeshes.Generators {
 				streams.SetTriangle(ti + 1, quad.xzw);
 
 				quad.y = quad.z;
-				quad += int4(1, 0, 1, 1);
+				quad += int4(1, 0, firstColumn && rhombus.id != 0 ? Resolution : 1, 1);
 
 				// pA = pC;
 				// pB = pD;
 			}
 
-			if( firstColumn && rhombus.id == 0) {
-				quad.w = quad.z + 1;
-			}
+			quad.z = Resolution * Resolution * rhombus.id + Resolution + u + 6;
+			quad.w = u < Resolution ? quad.z + 1 : rhombus.id + 4;
+
+			// if(rhombus.id == 0) {
+			// 	quad.z = Resolution + u + 6;
+			// 	quad.w = u < Resolution ? quad.z + 1 : 4;
+			// }
+			// else {
+			// 	quad.z = Resolution + u + 6 + Resolution * Resolution * rhombus.id;
+			// 	quad.w =  u < Resolution ?  quad.z + 1 : rhombus.id + 4;
+			// }
+
 
 			streams.SetTriangle(ti + 0, quad.xyz);
 			streams.SetTriangle(ti + 1, quad.xzw);
@@ -263,7 +305,8 @@ namespace ProceduralMeshes.Generators {
 					vertex.position = 
 						lerp(back(), up(), (float)(v - Resolution) / Resolution);
 				}
-				vertex.normal = normalize(vertex.position);
+				vertex.normal = vertex.position = normalize(vertex.position);
+				vertex.texCoord0.y = GetTexCoord(vertex.position).y;
 				streams.SetVertex(v + 7, vertex);
 			}
 		}
