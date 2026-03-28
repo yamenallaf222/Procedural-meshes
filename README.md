@@ -19,6 +19,29 @@ _Multi-stream approach for mesh data in the Advanced Mesh API of the Unity Engin
 
 
 
+<img width="320" height="380" alt="image" src="https://github.com/user-attachments/assets/11e6725b-00a9-450b-a762-12ad581ca13b" />
+
+_Triangle-based procdural plan_
+
+
+
+<img width="1024" height="512" alt="image" src="https://github.com/user-attachments/assets/b7729175-8327-4b63-89e1-bb0501594e8d" />
+
+_UV-based Sphere_
+
+<img width="1024" height="512" alt="image" src="https://github.com/user-attachments/assets/f31d2432-8707-46dc-b816-e3609a79b69c" />
+
+_Cube-based Sphere_
+
+
+
+<img width="1024" height="512" alt="image" src="https://github.com/user-attachments/assets/ff8533bb-e8e7-4219-87ab-e1fcf7eff8da" />
+
+_Seamless cube sphere that omits normals, tangents and texture coordinates which necessates cube maps instead of normal 2d based textures_
+
+
+
+
 • Advanced Unity mesh API.
 
 • Procedural generation of multitude of meshes (cubes, sphere, rhombuses, etc...).
